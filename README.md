@@ -1,3 +1,6 @@
+Projeto para treinar baseado em https://github.com/rafaellins-itau/desafio-itau-vaga-99-junior
+Como não é um desafio real irei implementar redis para treinar :)
+
 Para executar o projeto é necessario Node ou Docker instalado no sistema.
 
 Backend:
