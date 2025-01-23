@@ -45,6 +45,13 @@ app.post('/transacao', async (req, res) => {
   }
 });
 
+app.delete('/transacao', async (req, res) => {
+  const filePath = 'db/file.json';
+  await fs.writeFile(filePath, JSON.stringify([], null, 2), 'utf8');
+
+  res.status(200).send();
+});
+
 app.get('/estatistica', async (req, res) => {
   const filePath = 'db/file.json';
 
