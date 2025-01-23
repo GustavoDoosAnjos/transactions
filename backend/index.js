@@ -1,27 +1,36 @@
 import express from 'express';
+import swaggerUi from 'swagger-ui-express';
+import swaggerDocument from './swagger.json' with { type: "json" };
 import { promises as fs } from 'fs';
 
 const app = express();
 const port = 3000;
+const filePath = 'db/db.json';
 
 app.use(express.json());
+app.use('/api', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.get('/', (req, res) => {
-  res.send('Hi.');
+app.get('/Health', (req, res) => {
+  const data = {
+    uptime: process.uptime(),
+    message: 'Ok',
+    date: new Date(),
+  };
+  res.status(200).send(data);
 });
 
 app.post('/transacao', async (req, res) => {
   const transaction = req.body;
+  const today = new Date().getTime();
+  const transactionDate = new Date(transaction.dataHora).getTime();
+  const isValidTime = today - transactionDate > 0;
+  const isValidTransaction = transaction?.valor && transaction?.valor > 0;
 
-  // TODO VALIDAÇÕES
-
-  if (!transaction?.valor || !transaction?.dataHora) {
+  if (!isValidTransaction && isValidTime) {
     return res.status(422).send();
   }
 
   try {
-    const filePath = 'db/file.json';
-
     let transactions = [];
     try {
       const data = await fs.readFile(filePath, 'utf8');
@@ -46,18 +55,22 @@ app.post('/transacao', async (req, res) => {
 });
 
 app.delete('/transacao', async (req, res) => {
-  const filePath = 'db/file.json';
   await fs.writeFile(filePath, JSON.stringify([], null, 2), 'utf8');
 
   res.status(200).send();
 });
 
 app.get('/estatistica', async (req, res) => {
-  const filePath = 'db/file.json';
-
   try {
     const data = await fs.readFile(filePath, 'utf8');
     const transactions = JSON.parse(data);
+
+    const now = new Date();
+    const oneMinuteEarlier = new Date(now.getTime() - 1 * 60 * 1000);
+    const validTransactions = transactions.filter((item) => {
+      const itemDate = new Date(item.dataHora);
+      return itemDate >= oneMinuteEarlier && itemDate <= now;
+    });
 
     const statistics = {
       count: 0,
@@ -67,9 +80,9 @@ app.get('/estatistica', async (req, res) => {
       max: 0,
     };
 
-    if (transactions.length > 0) {
-      statistics['count'] = transactions.length;
-      transactions.map((item) => {
+    if (validTransactions.length > 0) {
+      statistics['count'] = validTransactions.length;
+      validTransactions.map((item) => {
         statistics['sum'] += item.valor;
         statistics['min'] = Math.min(statistics['min'], item.valor);
         statistics['max'] = Math.max(statistics['min'], item.valor);
@@ -82,7 +95,6 @@ app.get('/estatistica', async (req, res) => {
     res.status(200).send(JSON.stringify(statistics));
   } catch (err) {
     console.error(err);
-    res.status(500).send();
   }
 });
 
