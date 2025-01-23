@@ -1,0 +1,88 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Backend for transactions app",
+    "description": "Api",
+    "version": "1.0.0"
+  },
+
+  "host": "localhost:3000",
+  "basePath": "",
+  "schemes": ["http"],
+
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Returns some information about the API status.",
+        "description": "returns the uptime, message, current date and status of the API",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/transacao": {
+      "post": {
+        "summary": "Create a new transaction",
+        "description": "Creates a new transaction in db.json and creates the file if no file is encountered.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "transaction",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "valor": {
+                  "type": "integer"
+                },
+                "dataHora": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "example": {
+                "valor": 25,
+                "dataHora": "2028-07-10T15:00:00.000Z"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "A new transaction is created"
+          },
+          "422": {
+            "description": "Data received but not valid"
+          },
+          "400": {
+            "description": "Invalid JSON"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Deletes all transactions.",
+        "description": "Deletes all the transactions stored.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/estatistica": {
+      "get": {
+        "summary": "Returns a list of statistics.",
+        "description": "Returns a list of statistics about the transactions that ocurred in the last 60 seconds.",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  }
+}

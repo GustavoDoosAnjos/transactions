@@ -2,7 +2,7 @@
   "name": "transactions-backend",
   "version": "1.0.0",
   "description": "Backend for the transactions App using redis and local file storage.",
-  "type":"module",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js",
@@ -12,8 +12,18 @@
   "license": "MIT",
   "dependencies": {
     "express": "^4.21.2",
+    "fs": "^0.0.1-security",
     "jest": "^29.7.0",
+    "light-my-request": "^6.5.1",
     "nodemon": "^3.1.9",
-    "redis": "^4.7.0"
+    "redis": "^4.7.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
   }
 }
